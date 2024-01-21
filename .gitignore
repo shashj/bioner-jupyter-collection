@@ -2,3 +2,7 @@
 .git
 .git/
 PHI_Processed_data/
+*.lock
+*.log
+__main__
+prep_dataset/
