@@ -14,8 +14,8 @@ from pathlib import Path
 from datasets import load_dataset, ClassLabel, DownloadConfig
 
 from transformers import AutoTokenizer
-from UMLSBert.prep_dataset_i2b2 import i2b2deid2006Dataset
-from UMLSBert.tokenize_data_i2b2 import HFTokenizer
+from prep_dataset_i2b2 import i2b2deid2006Dataset
+from tokenize_data_i2b2 import HFTokenizer
 
 metric = load_metric("seqeval")
 
