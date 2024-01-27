@@ -14,8 +14,7 @@ from pathlib import Path
 from datasets import load_dataset, ClassLabel, DownloadConfig
 
 from transformers import AutoTokenizer
-from prep_dataset import i2b2deid2006Dataset
-from tokenize_data import HFTokenizer
+from UMLSBert.tokenize_data_ncbi import HFTokenizer
 
 metric = load_metric("seqeval")
 
@@ -48,7 +47,7 @@ def compute_metrics(p, label_list):
 
 if __name__ == "__main__":
     model_n_version = "umlsbertv1"
-    max_epochs = 50
+    max_epochs = 5
     learning_rate = 2e-5
     batch_size = 16
     model_root_dir = "./.cache/umlsbert/"
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     hf_pretrained_model_checkpoint = "GanjinZero/UMLSBert_ENG"
     hf_pretrained_tokenizer_checkpoint = "GanjinZero/UMLSBert_ENG"
 
-    hf_dataset = i2b2deid2006Dataset()
+    hf_dataset = load_dataset("ncbi_disease")
     hf_preprocessor = HFTokenizer.init_vf(hf_pretrained_tokenizer_checkpoint=hf_pretrained_tokenizer_checkpoint)
 
     hf_model = AutoModelForTokenClassification.from_pretrained(hf_pretrained_model_checkpoint,
