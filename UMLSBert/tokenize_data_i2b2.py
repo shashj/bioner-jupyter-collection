@@ -2,7 +2,7 @@ from datasets import load_metric
 import datasets
 from transformers import AutoTokenizer
 
-from prep_dataset import i2b2deid2006Dataset
+from prep_dataset_i2b2 import i2b2deid2006Dataset
 
 metric = load_metric("seqeval")
 

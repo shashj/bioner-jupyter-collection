@@ -14,6 +14,7 @@ from pathlib import Path
 from datasets import load_dataset, ClassLabel, DownloadConfig
 
 from transformers import AutoTokenizer
+from prep_dataset_ncbi import NCBIDiseaseDataset
 from tokenize_data_ncbi import HFTokenizer
 
 metric = load_metric("seqeval")
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     hf_pretrained_model_checkpoint = "GanjinZero/UMLSBert_ENG"
     hf_pretrained_tokenizer_checkpoint = "GanjinZero/UMLSBert_ENG"
 
-    hf_dataset = load_dataset("ncbi_disease")
+    hf_dataset = NCBIDiseaseDataset()
     hf_preprocessor = HFTokenizer.init_vf(hf_pretrained_tokenizer_checkpoint=hf_pretrained_tokenizer_checkpoint)
 
     hf_model = AutoModelForTokenClassification.from_pretrained(hf_pretrained_model_checkpoint,
