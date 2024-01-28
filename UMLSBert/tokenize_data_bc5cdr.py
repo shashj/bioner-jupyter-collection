@@ -3,7 +3,7 @@ import datasets
 from transformers import AutoTokenizer
 from datasets import load_dataset
 
-from prep_dataset_ncbi import NCBIDiseaseDataset
+from prep_dataset_bc5cdr import BC5CDRDataset
 
 import logging
 
@@ -32,7 +32,7 @@ class HFTokenizer(object):
                                            truncation=True,
                                            is_split_into_words=True)
         labels = []
-        for i, label in enumerate(examples[f"ner_tags"]):
+        for i, label in enumerate(examples[f"tags"]):
             word_ids = tokenized_inputs.word_ids(batch_index=i)
             previous_word_idx = None
             label_ids = []
@@ -58,7 +58,7 @@ class HFTokenizer(object):
 if __name__ == '__main__':
 
     hf_pretrained_tokenizer_checkpoint = "GanjinZero/UMLSBert_ENG"
-    dataset = NCBIDiseaseDataset().dataset
+    dataset = BC5CDRDataset().dataset
 
     hf_preprocessor = HFTokenizer.init_vf(hf_pretrained_tokenizer_checkpoint=hf_pretrained_tokenizer_checkpoint)
 
