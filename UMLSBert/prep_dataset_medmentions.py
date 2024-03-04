@@ -184,6 +184,8 @@ class MedMentions(datasets.GeneratorBasedBuilder):
                             ),
                         }
                     ],
+                    "tokens": datasets.Sequence(datasets.Value("string")),
+                    "ner_tags": datasets.Sequence(datasets.Value("string"))
                 }
             )
 
@@ -286,6 +288,53 @@ class MedMentions(datasets.GeneratorBasedBuilder):
     def _parse_pmid(self, raw_document):
         pmid, _ = raw_document[0].split("|", 1)
         return int(pmid)
+    
+    def get_token_role_in_span(self, token_start: int, token_end: int, span_start: int, span_end: int):
+        """
+        Check if the token is inside a span.
+        Args:
+        - token_start, token_end: Start and end offset of the token
+        - span_start, span_end: Start and end of the span
+        Returns:
+        - "B" if beginning
+        - "I" if inner
+        - "O" if outer
+        - "N" if not valid token (like <SEP>, <CLS>, <UNK>)
+        """
+        if token_end <= token_start:
+            return "N"
+        if token_start < span_start or token_end > span_end:
+            return "O"
+        if token_start > span_start:
+            return "I"
+        else:
+            return "B"
+        
+    def get_semantic_type(self, searchstr: str, entities: list, token_start: int, token_end: int) -> str:
+        for i in entities:
+            span_start = i.get('offsets')[0][0]
+            span_end = i.get('offsets')[0][1]
+            if (token_start>=span_start and token_end<=span_end):
+                if searchstr in i.get('text')[0]:
+                    return self.get_token_role_in_span(token_start, token_end, span_start, span_end)+'-' + i.get('semantic_type_id')[0]
+                
+            if searchstr[-1]=='.':
+                if (token_start>=span_start and token_end<=(span_end+1)):
+                    searchstr = searchstr[:-1]
+                    if searchstr in i.get('text')[0]:
+                        return self.get_token_role_in_span(token_start, token_end, span_start, span_end+1)+'-' + i.get('semantic_type_id')[0]
+        return "O"
+    
+    def assign_tags(self, all_tokens: str, entities: list, ner_tags: list):
+        for count, i in enumerate(all_tokens):
+            if count==0:
+                token_start=0
+            else:
+                token_start = token_end+1
+            token_end = token_start+len(i)
+            ner_tag = self.get_semantic_type(i, entities, token_start, token_end)
+            ner_tags.append(ner_tag)
+        return ner_tags
 
     def _parse_document(self, raw_document):
         pmid, type, title = raw_document[0].split("|", 2)
@@ -316,8 +365,13 @@ class MedMentions(datasets.GeneratorBasedBuilder):
                 "concept_id": entity_id,
             }
             entities.append(entity)
+            
+        text_combined = title + ' ' + abstract
+        all_tokens = text_combined.split(" ")
+        ner_tags = []
+        ner_tags = self.assign_tags(all_tokens, entities, ner_tags)
 
-        return {"pmid": int(pmid), "entities": entities, "passages": passages}
+        return {"pmid": int(pmid), "entities": entities, "passages": passages, "tokens":all_tokens, "ner_tags": ner_tags}
     
 class MedMentionsDataset(object):
     NAME = "MedMentionsDataset"
