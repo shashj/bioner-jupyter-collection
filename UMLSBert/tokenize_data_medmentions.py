@@ -30,7 +30,7 @@ class HFTokenizer(object):
                                   label_all_tokens=True):
         tokenized_inputs = self._tokenizer(examples["tokens"],
                                            truncation=True,
-                                           is_split_into_words=True)
+                                           is_split_into_words=True, max_length=512)
         labels = []
         for i, label in enumerate(examples[f"ner_tags"]):
             word_ids = tokenized_inputs.word_ids(batch_index=i)
