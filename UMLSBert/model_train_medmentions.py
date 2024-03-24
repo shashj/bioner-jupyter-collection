@@ -14,8 +14,8 @@ from pathlib import Path
 from datasets import load_dataset, ClassLabel, DownloadConfig
 
 from transformers import AutoTokenizer
-from prep_dataset import i2b2deid2006Dataset
-from tokenize_data import HFTokenizer
+from prep_dataset_medmentions import MedMentionsDataset
+from tokenize_data_medmentions import HFTokenizer
 
 metric = load_metric("seqeval")
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     hf_pretrained_model_checkpoint = "GanjinZero/UMLSBert_ENG"
     hf_pretrained_tokenizer_checkpoint = "GanjinZero/UMLSBert_ENG"
 
-    hf_dataset = i2b2deid2006Dataset()
+    hf_dataset = MedMentionsDataset()
     hf_preprocessor = HFTokenizer.init_vf(hf_pretrained_tokenizer_checkpoint=hf_pretrained_tokenizer_checkpoint)
 
     hf_model = AutoModelForTokenClassification.from_pretrained(hf_pretrained_model_checkpoint,

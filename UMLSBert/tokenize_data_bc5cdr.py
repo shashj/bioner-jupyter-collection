@@ -1,10 +1,9 @@
 from datasets import load_metric
 import datasets
 from transformers import AutoTokenizer
+from datasets import load_dataset
 
-from prep_dataset import i2b2deid2006Dataset
-
-metric = load_metric("seqeval")
+from prep_dataset_bc5cdr import BC5CDRDataset
 
 import logging
 
@@ -33,7 +32,7 @@ class HFTokenizer(object):
                                            truncation=True,
                                            is_split_into_words=True)
         labels = []
-        for i, label in enumerate(examples[f"ner_tags"]):
+        for i, label in enumerate(examples[f"tags"]):
             word_ids = tokenized_inputs.word_ids(batch_index=i)
             previous_word_idx = None
             label_ids = []
@@ -55,11 +54,11 @@ class HFTokenizer(object):
 
         tokenized_inputs["labels"] = labels
         return tokenized_inputs
-    
+
 if __name__ == '__main__':
 
     hf_pretrained_tokenizer_checkpoint = "GanjinZero/UMLSBert_ENG"
-    dataset = i2b2deid2006Dataset().dataset
+    dataset = BC5CDRDataset().dataset
 
     hf_preprocessor = HFTokenizer.init_vf(hf_pretrained_tokenizer_checkpoint=hf_pretrained_tokenizer_checkpoint)
 
