@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from tqdm import tqdm
 import pickle
-import os
+import os, re
 
 # Read the XML file
 file_path = '../datasets/i2b2/PHI_Processed_data/deid_surrogate_train_all_version2.xml'
@@ -43,3 +43,20 @@ with open(output_file_path, 'wb') as pickle_file:
     pickle.dump(data, pickle_file)
 
 print(f"All records data saved to {output_file_path}")
+
+
+## Storing all texts without GT
+
+records_text = {}
+for record in tqdm(root.findall('RECORD'), desc="Processing Texts"):
+    record_id = record.get('ID')
+    text = ET.tostring(record.find('TEXT'), encoding='unicode', method='text')
+    cleaned_text = re.sub(r'<[^>]+>', '', text).strip()
+    records_text[record_id] = cleaned_text
+
+# import code; code.interact(local=locals())
+
+# Save records_text to a pickle file
+output_file_path = os.path.join(output_dir, "all_records_train_text.pkl")
+with open(output_file_path, 'wb') as f:
+    pickle.dump(records_text, f)
