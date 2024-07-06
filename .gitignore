@@ -6,3 +6,4 @@ PHI_Processed_data/
 *.log
 __main__
 prep_dataset/
+train_jsons/
