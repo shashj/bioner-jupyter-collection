@@ -9,8 +9,8 @@ You are a medical curator and you are extracting all kinds of dates from below c
 Things to keep in mind while extracting dates:
 
 1. Consider dates without year or even a month as well
-2. If a date is repeated in different form extract that as well
-3. Extract them exactly as mentioned in the chart, do not modify, for example, if a date is written as 1st of April, extract `1st of April`, don't change it to date format
+2. If a date is repeated in different form extract that as well, for example, 1st of April is written and April 1st somewhere else in the chart, then also extract it
+3. Extract them exactly as mentioned in the chart, do not modify, for example, if a date is written as 1st of April, extract `1st of April`, don't change it to date format, if just day is written like 14th then extract just 14th
 4. Don't add any explanation or any other text
 
 Json output should look like this:
