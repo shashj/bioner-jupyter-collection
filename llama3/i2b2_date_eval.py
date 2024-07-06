@@ -3,7 +3,8 @@ from prompts.prompts import PromptCollection
 from outlines import models, generate
 from pydantic import BaseModel
 from outlines_schemas import ExpectedJSONOutputFormat_Dates
-import pickle, tqdm, os
+import pickle, os
+from tqdm import tqdm
 import outlines
 
 
@@ -23,20 +24,26 @@ with open('../datasets/i2b2/train_jsons/all_records_train_text.pkl', 'rb') as f:
 generated_dates = {}
 output_dir = "results_dates"
 
+if not os.path.exists(output_dir):
+    # Create the directory
+    os.makedirs(output_dir)
+    print(f"Directory '{output_dir}' created.")
+else:
+    print(f"Directory '{output_dir}' already exists.")
+
 for id, record in tqdm(loaded_records_text.items(), desc = "Running date Prompt"):
     prompt = prompts_obj.date_prompt(record)
     conversations = tokenizer.apply_chat_template(
         [{'role': 'user', 'content': prompt}],
         tokenize=False,
     )
-    generated_date = generator_dates(conversations, max_tokens=500, sampling_params=sampling_params)
+    try:
+        generated_date = generator_dates(conversations, max_tokens=500, sampling_params=sampling_params)
+    except Exception as e:
+        print(f"Error occurred for record {id}: {e}")
+        generated_dates[id] = ExpectedJSONOutputFormat_Dates(dates=None)
+        continue
     generated_dates[id] = generated_date
-    if not os.path.exists(output_dir):
-        # Create the directory
-        os.makedirs(output_dir)
-        print(f"Directory '{output_dir}' created.")
-    else:
-        print(f"Directory '{output_dir}' already exists.")
 
     with open(f'{output_dir}/train_date_results.pkl', 'wb') as f:
         pickle.dump(generated_dates, f)
