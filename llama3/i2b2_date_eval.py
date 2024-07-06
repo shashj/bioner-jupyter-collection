@@ -12,7 +12,7 @@ llm = LLM(model="meta-llama/Meta-Llama-3-8B-Instruct", dtype='float16')
 model = models.VLLM(llm)
 
 tokenizer = llm.get_tokenizer()
-sampling_params = SamplingParams(temperature=0.1, top_p=0.35, max_tokens=500, stop_token_ids=[tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("<|eot_id|>")], frequency_penalty=0.5, repetition_penalty=1.4)
+sampling_params = SamplingParams(temperature=0.1, top_p=0.35, max_tokens=500, stop_token_ids=[tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("<|eot_id|>")])
 
 prompts_obj = PromptCollection()
 
