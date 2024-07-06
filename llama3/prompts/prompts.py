@@ -15,9 +15,9 @@ Things to keep in mind while extracting dates:
 
 Json output should look like this:
 
-{
+{{
   "dates":['date 1', 'date 2', ...]
-}
+}}
 
 Patient chart is given below in backticks.
 ```

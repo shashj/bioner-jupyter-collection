@@ -1,5 +1,5 @@
 from vllm import LLM, SamplingParams
-from prompts import PromptCollection
+from prompts.prompts import PromptCollection
 from outlines import models, generate
 from pydantic import BaseModel
 from outlines_schemas import ExpectedJSONOutputFormat_Dates
@@ -13,7 +13,7 @@ model = models.VLLM(llm)
 tokenizer = llm.get_tokenizer()
 sampling_params = SamplingParams(temperature=0.1, top_p=0.35, max_tokens=500, stop_token_ids=[tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("<|eot_id|>")])
 
-prompts = PromptCollection()
+prompts_obj = PromptCollection()
 
 generator_dates = generate.json(model, ExpectedJSONOutputFormat_Dates, whitespace_pattern=r"[\n\t ]*")
 
@@ -24,7 +24,7 @@ generated_dates = {}
 output_dir = "results_dates"
 
 for id, record in tqdm(loaded_records_text.items(), desc = "Running date Prompt"):
-    prompt = prompts.date_prompt(record)
+    prompt = prompts_obj.date_prompt(record)
     conversations = tokenizer.apply_chat_template(
         [{'role': 'user', 'content': prompt}],
         tokenize=False,
