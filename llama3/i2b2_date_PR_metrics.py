@@ -84,6 +84,9 @@ def get_precision_recall_for_all_records(ground_truth_records_text, dates_result
         if list(dates_results[record].dict().values())[0] is None:
             continue
 
+        predicted_dates = list(dates_results[record].dict().values())[0]
+        predicted_dates_cleaned = [item for item in predicted_dates if item]
+
         # get predicted results
         include_vector = [
             (re.search(rf'(\(\s*{x}\s*\)|\b{x}\b)', ground_truth_records_text[record]).group()
@@ -98,7 +101,7 @@ def get_precision_recall_for_all_records(ground_truth_records_text, dates_result
                 if re.search(rf'(\(\s*{x}\s*\)|\b{x}\b)', ground_truth_records_text[record])
                 else None)
             )
-            for x in list(dates_results[record].dict().values())[0]
+            for x in predicted_dates_cleaned
         ]
 
         # Remove None values
@@ -169,7 +172,7 @@ if __name__=="__main__":
     results = get_precision_recall_for_all_records(ground_truth_records_text, dates_results, ground_truth_records)
 
     # Save results to a pickle file
-    with open('dates_precision_recall_results.pkl', 'wb') as f:
+    with open('./results_dates/dates_precision_recall_results.pkl', 'wb') as f:
         pickle.dump(results, f)
 
     print("Results have been saved to 'dates_precision_recall_results.pkl'")
