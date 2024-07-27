@@ -7,3 +7,4 @@ PHI_Processed_data/
 __main__
 prep_dataset/
 train_jsons/
+.vscode/*
