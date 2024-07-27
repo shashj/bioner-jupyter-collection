@@ -26,13 +26,22 @@ records = root.findall('.//RECORD')
 
 # Function to get the start and end offset of an element
 # Function to get the start and end offset of an element within its parent TEXT element
+
+def find_all_occurrences(full_text, element_text):
+    offsets = []
+    start = 0
+    while True:
+        start = full_text.find(element_text, start)
+        if start == -1:  # substring not found
+            return offsets
+        offsets.append((start, start + len(element_text)))
+        start += 1  # move past the last match
+
 def get_offsets(element, text_content):
     full_text = etree.tostring(element.getparent(), encoding='unicode', method='text')
     element_text = element.text
-    start_offset = full_text.index(element_text)
-    end_offset = start_offset + len(element_text)
     #import code; code.interact(local=locals())
-    return start_offset, end_offset
+    return find_all_occurrences(full_text, element_text)
 
 # Process each RECORD element with a progress bar
 for record in tqdm(records, desc="Processing records"):
@@ -47,15 +56,16 @@ for record in tqdm(records, desc="Processing records"):
         # Find all PHI tags within the current RECORD
         phi_tags = text_element.findall('.//PHI')
         for phi in phi_tags:
-            start_offset, end_offset = get_offsets(phi, text_content)
-            phi_entry = {
-                'TYPE': phi.get('TYPE'),
-                'TEXT': phi.text,
-                'START_OFFSET': start_offset,
-                'END_OFFSET': end_offset
-            }
-            #import code; code.interact(local=locals())
-            all_records[record_id].append(phi_entry)
+            offsets = get_offsets(phi, text_content)
+            for start_offset, end_offset in offsets:
+                phi_entry = {
+                    'TYPE': phi.get('TYPE'),
+                    'TEXT': phi.text,
+                    'START_OFFSET': start_offset,
+                    'END_OFFSET': end_offset
+                }
+                #import code; code.interact(local=locals())
+                all_records[record_id].append(phi_entry)
 
 # Save all records dictionary to a pickle file
 pickle_file_path = os.path.join(output_dir, 'all_records_train.pkl')

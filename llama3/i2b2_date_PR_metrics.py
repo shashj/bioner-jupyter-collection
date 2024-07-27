@@ -1,5 +1,6 @@
 import pickle
 import re
+from itertools import islice
 
 
 
@@ -76,8 +77,9 @@ def get_precision_recall_for_all_records(ground_truth_records_text, dates_result
     total_false_positives = 0
     total_false_negatives = 0
 
-    filtered_dict = {key: [item['TEXT'] for item in value if item['TYPE'] == 'DATE'] for key, value in ground_truth_records.items()}
+    filtered_dict = {key: [item for item in value if item['TYPE'] == 'DATE'] for key, value in ground_truth_records.items()}
 
+    # for record in islice(records, 3): for few first entries
     for record in records:
 
         print(f"PR for record: {record}")
@@ -117,17 +119,19 @@ def get_precision_recall_for_all_records(ground_truth_records_text, dates_result
             for item in final_predictions
             if (offsets := find_match_offsets(ground_truth_records_text[record], item))
         }
+        #print(results_pred)
 
         ## offsets for GT
 
-        results_gt = {
-            item: {
-                'offsets': offsets,
-                'ground_truth': item
-            }
-            for item in filtered_dict[record]
-            if (offsets := find_match_offsets(ground_truth_records_text[record], item))
-        }
+        results_gt = {}
+        for item in filtered_dict[record]:
+            text = item['TEXT']
+            offset = (item['START_OFFSET'], item['END_OFFSET'])
+            if text not in results_gt:
+                results_gt[text] = {'offsets': [offset], 'ground_truth': text}
+            else:
+                results_gt[text]['offsets'].append(offset)
+        # print(results_gt)
 
         # Calculate precision and recall
         precision, recall, true_positives, false_positives, false_negatives = calculate_precision_recall(results_gt, results_pred)
