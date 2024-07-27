@@ -179,5 +179,7 @@ if __name__=="__main__":
     with open('./results_dates/dates_precision_recall_results.pkl', 'wb') as f:
         pickle.dump(results, f)
 
+    # get logs python -u i2b2_date_PR_metrics.py > i2b2_date_PR_metrics_log.txt 2>&1
+
     print("Results have been saved to 'dates_precision_recall_results.pkl'")
 
