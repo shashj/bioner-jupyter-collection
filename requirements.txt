@@ -1,0 +1,8 @@
+accelerate
+datasets
+seqeval
+vllm
+flash-attn
+huggingface_hub
+ipython-autotime
+outlines==0.0.46
