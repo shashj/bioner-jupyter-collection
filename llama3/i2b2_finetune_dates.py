@@ -160,6 +160,8 @@ def print_trainable_parameters(model, use_4bit=False):
 
 max_length = get_max_length(model)
 
+model.config.use_cache = False
+
 peft_config = LoraConfig(
         lora_alpha=64,
         lora_dropout=0.05,
@@ -176,17 +178,14 @@ print_trainable_parameters(model)
 
 training_arguments = TrainingArguments(
         output_dir="./results_llama3_sft/",
-        evaluation_strategy="steps",
-        do_eval=True,
         optim="paged_adamw_8bit",
         per_device_train_batch_size=8,
         gradient_accumulation_steps=2,
         per_device_eval_batch_size=8,
         log_level="debug",
-        save_steps=1,
+        save_steps=100,
         logging_steps=1,
         learning_rate=8e-6,
-        eval_steps=1,
         max_steps=20,
         num_train_epochs=20,
         warmup_steps=3,
