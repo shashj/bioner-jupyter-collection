@@ -47,6 +47,9 @@ tokenizer = AutoTokenizer.from_pretrained(model_id)
 time_end = time()
 print(f"Prepare model, tokenizer: {round(time_end-time_start, 3)} sec.")
 
+model, tokenizer = setup_chat_format(model, tokenizer)
+model = prepare_model_for_kbit_training(model)
+
 
 ## prepare dataset
 
@@ -112,8 +115,24 @@ processed_dataset = dataset.map(
 
 dataset = processed_dataset.train_test_split(test_size=0.1)
 
+def get_max_length(model):
+    conf = model.config
+    max_length = None
+    for length_setting in ["n_positions", "max_position_embeddings", "seq_length"]:
+        max_length = getattr(model.config, length_setting, None)
+        if max_length:
+            print(f"Found max lenth: {max_length}")
+            break
+    if not max_length:
+        max_length = 1024
+        print(f"Using default max length: {max_length}")
+    return max_length
 
 ## Training
+
+## check this too: https://blog.ovhcloud.com/fine-tuning-llama-2-models-using-a-single-gpu-qlora-and-ai-notebooks/
+
+max_length = get_max_length(model)
 
 peft_config = LoraConfig(
         lora_alpha=64,
@@ -152,7 +171,7 @@ trainer = SFTTrainer(
         eval_dataset=dataset['test'],
         peft_config=peft_config,
         dataset_text_field="text",
-        max_seq_length=512,
+        max_seq_length=max_length,
         tokenizer=tokenizer,
         args=training_arguments,
 )
