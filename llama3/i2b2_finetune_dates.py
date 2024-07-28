@@ -104,11 +104,16 @@ def convert_to_chat_format(data_point):
 
     return {"messages": chat}
 
+processed_dataset_messages = dataset.map(
+    convert_to_chat_format,
+    num_proc= os.cpu_count(),
+)
+
 def format_chat_template(row):
     chat = tokenizer.apply_chat_template(row["messages"], tokenize=False)
     return {"text":chat}
 
-processed_dataset = dataset.map(
+processed_dataset = processed_dataset_messages.map(
     format_chat_template,
     num_proc= os.cpu_count(),
 )
