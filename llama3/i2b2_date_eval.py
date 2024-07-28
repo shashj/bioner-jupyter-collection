@@ -1,4 +1,4 @@
-from vllm import LLM, SamplingParams
+from vllm import LLM, SamplingParams # type: ignore
 from prompts.prompts import PromptCollection
 from outlines import models, generate
 from pydantic import BaseModel
