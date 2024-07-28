@@ -6,3 +6,7 @@ flash-attn
 huggingface_hub
 ipython-autotime
 outlines==0.0.46
+bitsandbytes
+transformers
+peft
+trl
