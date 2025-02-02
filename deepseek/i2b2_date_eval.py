@@ -7,7 +7,6 @@ from postprocess_response import process_response
 
 llm = LLM(model="deepseek-ai/DeepSeek-R1-Distill-Llama-8B")
 
-tokenizer = llm.get_tokenizer()
 sampling_params = SamplingParams(temperature=0.1, top_p=0.35, max_tokens=3000)
 
 prompts_obj = PromptCollection()
