@@ -83,10 +83,10 @@ def get_precision_recall_for_all_records(ground_truth_records_text, dates_result
     for record in records:
 
         print(f"PR for record: {record}")
-        if list(dates_results[record].dict().values())[0] is None:
+        if list(dates_results[record].values())[0] is None:
             continue
 
-        predicted_dates = list(dates_results[record].dict().values())[0]
+        predicted_dates = list(dates_results[record].values())[0]
         predicted_dates_cleaned = [item for item in predicted_dates if item]
 
         # get predicted results
