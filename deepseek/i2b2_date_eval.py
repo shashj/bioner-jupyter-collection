@@ -1,22 +1,16 @@
 from vllm import LLM, SamplingParams # type: ignore
 from prompts.prompts import PromptCollection
-from outlines import models, generate
-from pydantic import BaseModel
-from outlines_schemas import ExpectedJSONOutputFormat_Dates
 import pickle, os
 from tqdm import tqdm
-import outlines
+from postprocess_response import process_response
 
 
-llm = LLM(model="meta-llama/Meta-Llama-3-8B-Instruct", dtype='float16')
-model = models.VLLM(llm)
+llm = LLM(model="deepseek-ai/DeepSeek-R1-Distill-Llama-8B")
 
 tokenizer = llm.get_tokenizer()
-sampling_params = SamplingParams(temperature=0.1, top_p=0.35, max_tokens=1000, stop_token_ids=[tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("<|eot_id|>")])
+sampling_params = SamplingParams(temperature=0.1, top_p=0.35, max_tokens=3000)
 
 prompts_obj = PromptCollection()
-
-generator_dates = generate.json(model, ExpectedJSONOutputFormat_Dates, whitespace_pattern=r"[\n\t ]*")
 
 with open('../datasets/i2b2/train_jsons/all_records_train_text.pkl', 'rb') as f:
     loaded_records_text = pickle.load(f)
@@ -33,15 +27,12 @@ else:
 
 for id, record in tqdm(loaded_records_text.items(), desc = "Running date Prompt"):
     prompt = prompts_obj.date_prompt(record)
-    conversations = tokenizer.apply_chat_template(
-        [{'role': 'user', 'content': prompt}],
-        tokenize=False,
-    )
     try:
-        generated_date = generator_dates(conversations, max_tokens=500, sampling_params=sampling_params)
+        generated_date = llm.generate([prompt], sampling_params)
+        generated_date = process_response(generated_date[0].outputs[0].text)
     except Exception as e:
         print(f"Error occurred for record {id}: {e}")
-        generated_dates[id] = ExpectedJSONOutputFormat_Dates(dates=None)
+        generated_dates[id] = {}
         continue
     generated_dates[id] = generated_date
 
